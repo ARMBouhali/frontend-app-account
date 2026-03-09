@@ -75,6 +75,18 @@ describe('AccountSettingsPage', () => {
             field_name: 'work_experience',
             field_value: '',
           },
+          {
+            field_name: 'wilaya',
+            field_value: '',
+          },
+          {
+            field_name: 'group',
+            field_value: '',
+          },
+          {
+            field_name: 'code',
+            field_value: '',
+          },
         ],
         country: 'US',
         level_of_education: 'b',
@@ -181,7 +193,19 @@ describe('AccountSettingsPage', () => {
     expect(screen.getByText('Bachelor\'s Degree')).toBeInTheDocument();
     expect(screen.getByText('Male')).toBeInTheDocument();
     expect(screen.getByText('Add work experience')).toBeInTheDocument();
+    expect(screen.getByText('Add wilaya')).toBeInTheDocument();
+    expect(screen.getByText('Add group')).toBeInTheDocument();
+    expect(screen.getByText('Add code')).toBeInTheDocument();
     expect(screen.getByText('English')).toBeInTheDocument();
+  });
+
+  it('does not allow editing group before selecting wilaya', () => {
+    render(reduxWrapper(<IntlAccountSettingsPage {...props} />));
+
+    const groupLabel = screen.getByText('Group');
+    const groupField = groupLabel.closest('.form-group');
+    expect(groupField).toBeInTheDocument();
+    expect(groupField.querySelector('button')).not.toBeInTheDocument();
   });
 
   it('renders Social Media section with correct field values', () => {

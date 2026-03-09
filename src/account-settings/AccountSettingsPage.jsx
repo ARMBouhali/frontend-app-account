@@ -49,11 +49,14 @@ import {
   getStatesList,
   FIELD_LABELS,
 } from './data/constants';
+import groupMap from './data/groups.json';
 import { fetchSiteLanguages } from './site-language';
 import { fetchNotificationPreferences } from '../notification-preferences/data/thunks';
 import NotificationSettings from '../notification-preferences/NotificationSettings';
 import { withLocation, withNavigate } from './hoc';
 import AdditionalProfileFieldsSlot from '../plugin-slots/AdditionalProfileFieldsSlot';
+
+const EXTENDED_PROFILE_CUSTOM_FIELDS = ['wilaya', 'group', 'code'];
 
 class AccountSettingsPage extends React.Component {
   constructor(props, context) {
@@ -157,6 +160,17 @@ class AccountSettingsPage extends React.Component {
       value: key,
       label: key === '' ? this.props.intl.formatMessage(messages['account.settings.field.work.experience.options.empty']) : key,
     })),
+    wilayaOptions: [{
+      value: '',
+      label: this.props.intl.formatMessage(messages['account.settings.field.wilaya.options.empty']),
+    }].concat(Object.keys(groupMap).map(name => ({ value: name, label: name }))),
+    groupOptions: Object.fromEntries(Object.entries(groupMap).map(
+      ([wilaya, groups]) => ([wilaya, [{
+        value: '',
+        label: this.props.intl.formatMessage(messages['account.settings.field.group.options.empty']),
+      }].concat(groups.map(groupName => ({ value: groupName, label: groupName }))),
+      ]),
+    )),
   }));
 
   canDeleteAccount = () => {
@@ -186,15 +200,30 @@ class AccountSettingsPage extends React.Component {
     const { formValues } = this.props;
     let extendedProfileObject = {};
 
-    if ('extended_profile' in formValues && formValues.extended_profile.some((field) => field.field_name === formId)) {
-      extendedProfileObject = {
-        extended_profile: formValues.extended_profile.map(field => (field.field_name === formId
-          ? { ...field, field_value: values }
-          : field)),
-      };
+    const hasExtendedProfileField = (
+      'extended_profile' in formValues
+      && formValues.extended_profile.some((field) => field.field_name === formId)
+    );
+    if (hasExtendedProfileField || EXTENDED_PROFILE_CUSTOM_FIELDS.includes(formId)) {
+      const existingExtendedProfile = formValues.extended_profile || [];
+      if (existingExtendedProfile.some(field => field.field_name === formId)) {
+        extendedProfileObject = {
+          extended_profile: existingExtendedProfile.map(field => (field.field_name === formId
+            ? { ...field, field_value: values }
+            : field)),
+        };
+      } else {
+        extendedProfileObject = {
+          extended_profile: [...existingExtendedProfile, { field_name: formId, field_value: values }],
+        };
+      }
     }
     this.props.saveSettings(formId, values, extendedProfileObject);
   };
+
+  getExtendedProfileFieldValue = (fieldName) => (
+    this.props.formValues?.extended_profile?.find(field => field.field_name === fieldName)?.field_value || ''
+  );
 
   handleSubmitProfileName = (formId, values) => {
     if (Object.keys(this.props.drafts).includes('useVerifiedNameForCerts')) {
@@ -500,6 +529,8 @@ class AccountSettingsPage extends React.Component {
       educationLevelOptions,
       genderOptions,
       workExperienceOptions,
+      wilayaOptions,
+      groupOptions,
     } = this.getLocalizedOptions(this.context.locale, this.props.formValues.country);
 
     // Show State field only if the country is US (could include Canada later)
@@ -508,6 +539,7 @@ class AccountSettingsPage extends React.Component {
     const { verifiedName } = this.props;
 
     const hasWorkExperience = !!this.props.formValues?.extended_profile?.find(field => field.field_name === 'work_experience');
+    const selectedWilaya = this.getExtendedProfileFieldValue('wilaya');
 
     const timeZoneOptions = this.getLocalizedTimeZoneOptions(
       this.props.timeZoneOptions,
@@ -732,6 +764,37 @@ class AccountSettingsPage extends React.Component {
             label={this.props.intl.formatMessage(messages['account.settings.field.language.proficiencies'])}
             emptyLabel={this.props.intl.formatMessage(messages['account.settings.field.language.proficiencies.empty'])}
             {...editableFieldProps}
+          />
+          <EditableSelectField
+            name="wilaya"
+            type="select"
+            value={selectedWilaya}
+            options={wilayaOptions}
+            label={this.props.intl.formatMessage(messages['account.settings.field.wilaya'])}
+            emptyLabel={this.props.intl.formatMessage(messages['account.settings.field.wilaya.empty'])}
+            onChange={this.handleEditableFieldChange}
+            onSubmit={this.handleSubmit}
+          />
+          <EditableSelectField
+            name="group"
+            type="select"
+            value={this.getExtendedProfileFieldValue('group')}
+            isEditable={this.isEditable('group') && selectedWilaya.length > 0}
+            isGrayedOut={!selectedWilaya || !this.isEditable('group')}
+            options={groupOptions?.[selectedWilaya] ?? []}
+            label={this.props.intl.formatMessage(messages['account.settings.field.group'])}
+            emptyLabel={this.props.intl.formatMessage(messages['account.settings.field.group.empty'])}
+            onChange={this.handleEditableFieldChange}
+            onSubmit={this.handleSubmit}
+          />
+          <EditableField
+            name="code"
+            type="text"
+            value={this.getExtendedProfileFieldValue('code')}
+            label={this.props.intl.formatMessage(messages['account.settings.field.code'])}
+            emptyLabel={this.props.intl.formatMessage(messages['account.settings.field.code.empty'])}
+            onChange={this.handleEditableFieldChange}
+            onSubmit={this.handleSubmit}
           />
 
           <AdditionalProfileFieldsSlot />

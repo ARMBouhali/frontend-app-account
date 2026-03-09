@@ -17,6 +17,18 @@ const mockData = {
           field_name: 'work_experience',
           field_value: '',
         },
+        {
+          field_name: 'wilaya',
+          field_value: '',
+        },
+        {
+          field_name: 'group',
+          field_value: '',
+        },
+        {
+          field_name: 'code',
+          field_value: '',
+        },
       ],
       gender: 'm',
       'pref-lang': 'en',

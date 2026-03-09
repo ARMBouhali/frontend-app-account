@@ -452,6 +452,46 @@ const messages = defineMessages({
     defaultMessage: 'Select a Language',
     description: 'Option for an empty value on account settings spoken language field.',
   },
+  'account.settings.field.wilaya': {
+    id: 'account.settings.field.wilaya',
+    defaultMessage: 'Wilaya',
+    description: 'Label for account settings wilaya field.',
+  },
+  'account.settings.field.wilaya.empty': {
+    id: 'account.settings.field.wilaya.empty',
+    defaultMessage: 'Add wilaya',
+    description: 'Placeholder for empty account settings wilaya field.',
+  },
+  'account.settings.field.wilaya.options.empty': {
+    id: 'account.settings.field.wilaya.options.empty',
+    defaultMessage: 'Select your wilaya',
+    description: 'Option for an empty value on account settings wilaya field.',
+  },
+  'account.settings.field.group': {
+    id: 'account.settings.field.group',
+    defaultMessage: 'Group',
+    description: 'Label for account settings group field.',
+  },
+  'account.settings.field.group.empty': {
+    id: 'account.settings.field.group.empty',
+    defaultMessage: 'Add group',
+    description: 'Placeholder for empty account settings group field.',
+  },
+  'account.settings.field.group.options.empty': {
+    id: 'account.settings.field.group.options.empty',
+    defaultMessage: 'Select your group',
+    description: 'Option for an empty value on account settings group field.',
+  },
+  'account.settings.field.code': {
+    id: 'account.settings.field.code',
+    defaultMessage: 'Code',
+    description: 'Label for account settings code field.',
+  },
+  'account.settings.field.code.empty': {
+    id: 'account.settings.field.code.empty',
+    defaultMessage: 'Add code',
+    description: 'Placeholder for empty account settings code field.',
+  },
 
   'account.settings.field.time.zone': {
     id: 'account.settings.field.time.zone',
